@@ -236,7 +236,7 @@ export default forwardRef(function WebcamFeed({ sessionId, onTerminate, onCamera
     }
   };
 
-  const scoreColor = suspicionScore < 30 ? 'green' : suspicionScore < 60 ? 'orange' : 'red';
+  const scoreColor = suspicionScore < 20 ? 'green' : suspicionScore < 40 ? 'orange' : 'var(--danger-color)';
 
   return (
     <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 1000, width: 280 }}>
@@ -285,26 +285,21 @@ export default forwardRef(function WebcamFeed({ sessionId, onTerminate, onCamera
         }
       `}</style>
 
-      {/* Suspicion Score */}
+      {/* Suspicion Tracker (Score Hidden from Candidate by Request) */}
       <div style={{
         marginTop: 8, padding: '8px 12px',
-        background: 'white', borderRadius: 6,
+        background: 'var(--surface-color)', borderRadius: 6,
         border: `2px solid ${scoreColor}`
       }}>
-        <div style={{ fontSize: 11, color: '#666' }}>Suspicion Score</div>
-        <div style={{ fontSize: 20, fontWeight: 'bold', color: scoreColor }}>
-          {suspicionScore} / 100
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', fontWeight: 'bold', textAlign: 'center' }}>
+          Proctoring Active
         </div>
-        <div style={{
-          height: 6, background: '#eee', borderRadius: 3, marginTop: 4
-        }}>
-          <div style={{
-            height: '100%', borderRadius: 3,
-            width: `${Math.min(suspicionScore, 100)}%`,
-            background: scoreColor,
-            transition: 'width 0.3s'
-          }} />
-        </div>
+        
+        {suspicionScore >= 20 && (
+          <div className="pulse-danger" style={{ fontSize: '0.75rem', color: 'var(--danger-color)', background: 'rgba(239, 68, 68, 0.1)', padding: '0.5rem', borderRadius: '4px', textAlign: 'center', fontWeight: 'bold' }}>
+            ⚠️ Warning: If you reach a score of 60, you will be automatically eliminated from the exam!
+          </div>
+        )}
       </div>
 
       {/* Recent Violations */}

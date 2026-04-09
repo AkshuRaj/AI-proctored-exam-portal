@@ -28,7 +28,7 @@ class SuspicionEngine:
         'unknown_object': 'low',
     }
 
-    TERMINATION_THRESHOLD = 100
+    TERMINATION_THRESHOLD = 60
 
     def __init__(self):
         self.violation_history = []
@@ -45,7 +45,8 @@ class SuspicionEngine:
             'total_score': self.total_score,
             'severity': self.SEVERITY.get(violation_type, 'low'),
             'timestamp': datetime.utcnow().isoformat(),
-            'metadata': metadata or {}
+            'metadata': metadata or {},
+            'should_terminate': self.total_score >= self.TERMINATION_THRESHOLD
         }
         self.violation_history.append(violation)
         return violation

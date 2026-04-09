@@ -198,10 +198,15 @@ export default function ExamPage() {
     }
   };
 
-  const handleTerminate = (score) => {
+  const handleTerminate = async (score) => {
     // Stop webcam when exam is terminated
     if (webcamRef.current) {
       webcamRef.current.stopWebcam();
+    }
+    try {
+      await api.post(`/exams/session/${sessionId}/terminate`);
+    } catch (err) {
+      console.error('Termination recorded failed:', err);
     }
     alert(`⚠️ Your exam has been terminated due to suspicious activity. Suspicion Score: ${score}`);
     navigate('/candidate');

@@ -9,6 +9,7 @@ export default function AdminDashboard() {
   const navigate                 = useNavigate();
   const [exams, setExams]        = useState([]);
   const [users, setUsers]        = useState([]);
+  const [reports, setReports]    = useState([]);
   const [activeTab, setActiveTab] = useState('exams');
 
   // Create exam form
@@ -30,6 +31,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchExams();
     fetchUsers();
+    fetchReports();
   }, []);
 
   const fetchExams = () => {
@@ -40,6 +42,10 @@ export default function AdminDashboard() {
     api.get('/admin/users').then(res =>
       setUsers(res.data.filter(u => u.role === 'candidate'))
     );
+  };
+
+  const fetchReports = () => {
+    api.get('/admin/reports').then(res => setReports(res.data)).catch(err => console.error("Failed to load reports", err));
   };
 
   const showMessage = (msg) => {
@@ -130,6 +136,7 @@ export default function AdminDashboard() {
         <div style={tabStyle('exams')}     onClick={() => setActiveTab('exams')}>📋 Exams</div>
         <div style={tabStyle('questions')} onClick={() => setActiveTab('questions')}>❓ Add Questions</div>
         <div style={tabStyle('assign')}    onClick={() => setActiveTab('assign')}>👤 Assign</div>
+        <div style={tabStyle('reports')}   onClick={() => setActiveTab('reports')}>📈 Reports</div>
       </div>
 
       {/* TAB 1 — Create & View Exams */}
@@ -242,6 +249,57 @@ export default function AdminDashboard() {
               Assign Exam
             </button>
           </form>
+        </div>
+      )}
+
+      {/* TAB 4 — Reports */}
+      {activeTab === 'reports' && (
+        <div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2>Candidate Reports</h2>
+            <button onClick={fetchReports} style={{ padding: '6px 12px', borderRadius: 6 }}>Refresh</button>
+          </div>
+          
+          <div style={{ overflowX: 'auto', marginTop: 16 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr style={{ background: 'var(--surface-color)', borderBottom: '2px solid var(--border-color)' }}>
+                  <th style={{ padding: 12 }}>Candidate</th>
+                  <th style={{ padding: 12 }}>Exam</th>
+                  <th style={{ padding: 12 }}>Date Completed</th>
+                  <th style={{ padding: 12 }}>Status</th>
+                  <th style={{ padding: 12 }}>Exam Score</th>
+                  <th style={{ padding: 12 }}>Suspicion Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reports.map((r, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--border-color)' }}>
+                    <td style={{ padding: 12 }}>
+                      <div><strong>{r.candidate_name}</strong></div>
+                      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{r.candidate_email}</div>
+                    </td>
+                    <td style={{ padding: 12 }}>{r.exam_title}</td>
+                    <td style={{ padding: 12 }}>{r.end_time !== 'N/A' ? new Date(r.end_time).toLocaleString() : 'Not finished'}</td>
+                    <td style={{ padding: 12, textTransform: 'capitalize', fontWeight: 'bold', color: r.status === 'terminated' ? 'var(--danger-color)' : r.status === 'submitted' ? 'var(--success-color)' : 'orange' }}>
+                      {r.status.replace('_', ' ')}
+                    </td>
+                    <td style={{ padding: 12, fontWeight: 'bold' }}>{r.score}{r.score !== 'N/A' && '%'}</td>
+                    <td style={{ padding: 12, fontWeight: 'bold', color: r.suspicion_score > 60 ? 'var(--danger-color)' : r.suspicion_score > 20 ? 'orange' : 'var(--success-color)' }}>
+                      {r.suspicion_score}
+                    </td>
+                  </tr>
+                ))}
+                {reports.length === 0 && (
+                  <tr>
+                    <td colSpan="6" style={{ padding: 24, textAlign: 'center', color: 'var(--text-secondary)' }}>
+                      No exam records found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
 

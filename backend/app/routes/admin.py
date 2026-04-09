@@ -104,3 +104,39 @@ def get_users():
 def get_exams():
     exams = Exam.query.all()
     return jsonify([e.to_dict() for e in exams]), 200
+
+
+# ─── GET EXAM REPORTS (ADMIN & RECRUITER) ──────────────────
+@admin_bp.route('/reports', methods=['GET'])
+@role_required('admin', 'recruiter')
+def get_reports():
+    from app.models.violation import Violation
+    from app.services.proctor.suspicion_engine import SuspicionEngine
+    sessions = ExamSession.query.all()
+    
+    reports = []
+    for s in sessions:
+        user = User.query.get(s.user_id)
+        exam = Exam.query.get(s.exam_id)
+        
+        # Calculate suspicion score dynamically from violations
+        violations = Violation.query.filter_by(session_id=s.id).all()
+        suspicion_score = 0
+        for v in violations:
+            suspicion_score += SuspicionEngine.SCORES.get(v.violation_type.name, 5)
+            
+        reports.append({
+            'session_id': s.id,
+            'candidate_name': user.full_name,
+            'candidate_email': user.email,
+            'exam_title': exam.title,
+            'status': s.status.value,
+            'score': s.score if s.score is not None else 'N/A',
+            'suspicion_score': min(suspicion_score, 100),  # Or min to 60 if it was terminated at 60
+            'started_at': s.started_at.isoformat(),
+            'end_time': s.submitted_at.isoformat() if s.submitted_at else 'N/A'
+        })
+        
+    # Sort by submitted_at descending (latest first)
+    reports.sort(key=lambda x: x['end_time'] if x['end_time'] != 'N/A' else '0', reverse=True)
+    return jsonify(reports), 200

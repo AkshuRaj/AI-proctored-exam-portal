@@ -213,6 +213,21 @@ def register_socket_events(socketio):
         
         if not tab_visible:
             v = engine.add_violation('tab_switch', 1.0, {})
+            try:
+                from app.models.violation import Violation, ViolationType, Severity
+                from app.models.session import ExamSession, SessionStatus
+                from app.extensions import db
+                new_v = Violation(session_id=session_id, violation_type=ViolationType['tab_switch'], severity=Severity['medium'], description="Tab hidden")
+                db.session.add(new_v)
+                
+                if v.get('should_terminate'):
+                    session = ExamSession.query.get(session_id)
+                    if session and session.status == SessionStatus.in_progress:
+                        session.status = SessionStatus.terminated
+                        session.score = 0.0
+                db.session.commit()
+            except Exception as e:
+                print("DB write err:", e)
             socketio.emit('violation', v, to=request.sid)
             # Will naturally update score through engine
 
@@ -241,11 +256,41 @@ def register_socket_events(socketio):
             yolo_result = yolo_detector.analyze(frame)
             if yolo_result.get('phone_detected'):
                 v = engine.add_violation('phone_detected', 1.0, yolo_result)
+                try:
+                    from app.models.violation import Violation, ViolationType, Severity
+                    from app.models.session import ExamSession, SessionStatus
+                    from app.extensions import db
+                    new_v = Violation(session_id=session_id, violation_type=ViolationType['phone_detected'], severity=Severity['high'])
+                    db.session.add(new_v)
+                    
+                    if v.get('should_terminate'):
+                        session = ExamSession.query.get(session_id)
+                        if session and session.status == SessionStatus.in_progress:
+                            session.status = SessionStatus.terminated
+                            session.score = 0.0
+                    db.session.commit()
+                except Exception as e:
+                    pass
                 socketio.emit('violation', v, to=request.sid)
             
             person_count = yolo_result.get('person_count', 0)
             if person_count > 1:
                 v = engine.add_violation('multiple_faces', 1.0, {'person_count': person_count})
+                try:
+                    from app.models.violation import Violation, ViolationType, Severity
+                    from app.models.session import ExamSession, SessionStatus
+                    from app.extensions import db
+                    new_v = Violation(session_id=session_id, violation_type=ViolationType['multiple_faces'], severity=Severity['high'])
+                    db.session.add(new_v)
+                    
+                    if v.get('should_terminate'):
+                        session = ExamSession.query.get(session_id)
+                        if session and session.status == SessionStatus.in_progress:
+                            session.status = SessionStatus.terminated
+                            session.score = 0.0
+                    db.session.commit()
+                except Exception as e:
+                    pass
                 socketio.emit('violation', v, to=request.sid)
                 
             # Run Face Detection
@@ -256,6 +301,21 @@ def register_socket_events(socketio):
                 # If YOLO also couldn't find a person, mark as no_face
                 if person_count == 0:
                     v = engine.add_violation('no_face', 1.0, {})
+                    try:
+                        from app.models.violation import Violation, ViolationType, Severity
+                        from app.models.session import ExamSession, SessionStatus
+                        from app.extensions import db
+                        new_v = Violation(session_id=session_id, violation_type=ViolationType['no_face'], severity=Severity['medium'])
+                        db.session.add(new_v)
+                        
+                        if v.get('should_terminate'):
+                            session = ExamSession.query.get(session_id)
+                            if session and session.status == SessionStatus.in_progress:
+                                session.status = SessionStatus.terminated
+                                session.score = 0.0
+                        db.session.commit()
+                    except Exception as e:
+                        pass
                     socketio.emit('violation', v, to=request.sid)
                     face_status = 'No face detected'
             else:
@@ -264,6 +324,21 @@ def register_socket_events(socketio):
                 
                 if gaze_info.get('is_suspicious', False):
                     v = engine.add_violation('gaze_away', gaze_info.get('confidence', 0.8), gaze_info)
+                    try:
+                        from app.models.violation import Violation, ViolationType, Severity
+                        from app.models.session import ExamSession, SessionStatus
+                        from app.extensions import db
+                        new_v = Violation(session_id=session_id, violation_type=ViolationType['gaze_away'], severity=Severity['low'])
+                        db.session.add(new_v)
+                        
+                        if v.get('should_terminate'):
+                            session = ExamSession.query.get(session_id)
+                            if session and session.status == SessionStatus.in_progress:
+                                session.status = SessionStatus.terminated
+                                session.score = 0.0
+                        db.session.commit()
+                    except Exception as e:
+                        pass
                     socketio.emit('violation', v, to=request.sid)
                     face_status = f"Looking away ({gaze_info.get('direction', 'unknown')})"
             

@@ -134,6 +134,29 @@ def submit_exam(session_id):
     }), 200
 
 
+# ─── TERMINATE EXAM (DUE TO PROCTORING FAILURE) ───────────
+@exams_bp.route('/session/<int:session_id>/terminate', methods=['POST'])
+@jwt_required()
+def terminate_exam(session_id):
+    user_id = int(get_jwt_identity())
+    session = ExamSession.query.get_or_404(session_id)
+
+    if session.user_id != user_id:
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    if session.status == SessionStatus.submitted:
+        return jsonify({'error': 'Exam already submitted'}), 400
+
+    session.status       = SessionStatus.terminated
+    session.submitted_at = datetime.utcnow()
+    # Force score to 0 or leave None based on policy. Doing 0 for terminated
+    session.score = 0.0
+    
+    db.session.commit()
+
+    return jsonify({'message': 'Exam terminated due to proctoring violations.'}), 200
+
+
 # ─── GET RESULTS ─────────────────────────────────────────
 @exams_bp.route('/session/<int:session_id>/result', methods=['GET'])
 @jwt_required()
