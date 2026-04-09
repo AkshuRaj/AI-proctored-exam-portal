@@ -129,73 +129,62 @@ export default function CandidateDashboard() {
   if (loading) return <div style={{ padding: 40 }}>Loading...</div>;
 
   return (
-    <div style={{ maxWidth: 800, margin: '40px auto', padding: 24, position: 'relative' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div className="app-container animate-fade-in" style={{ position: 'relative' }}>
+      <div className="flex-between">
         <div>
-          <h1>Welcome, {user?.full_name}!</h1>
-          <p style={{ color: '#666' }}>Role: {user?.role}</p>
+          <h1 style={{ color: 'var(--primary-color)' }}>Welcome, {user?.full_name}!</h1>
+          <p className="read-the-docs">Role: {user?.role}</p>
         </div>
-        <button onClick={handleLogout} style={{ padding: '8px 16px', borderRadius: 6 }}>Logout</button>
+        <button onClick={handleLogout} className="btn-outline">Logout</button>
       </div>
 
-      <h2 style={{ marginTop: 32 }}>My Exams</h2>
+      <h2 style={{ marginTop: '2rem', marginBottom: '1.5rem' }}>My Exams</h2>
 
       {exams.length === 0 ? (
-        <p style={{ color: '#666' }}>No exams assigned yet.</p>
+        <p className="read-the-docs">No exams assigned yet.</p>
       ) : (
-        exams.map(item => (
-          <div key={item.session_id} style={{
-            border: '1px solid #ddd',
-            borderRadius: 8,
-            padding: 20,
-            marginBottom: 16,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <div>
-              <h3 style={{ margin: 0 }}>{item.exam.title}</h3>
-              <p style={{ color: '#666', margin: '4px 0' }}>{item.exam.description}</p>
-              <p style={{ margin: '4px 0', fontSize: 14 }}>
-                Duration: {item.exam.duration_minutes} mins &nbsp;|&nbsp;
-                Questions: {item.exam.question_count} &nbsp;|&nbsp;
-                Passing: {item.exam.passing_score}%
-              </p>
-              {item.score !== null && (
-                <p style={{ fontWeight: 'bold', margin: '4px 0' }}>Score: {item.score}%</p>
-              )}
+        <div className="card-grid">
+          {exams.map(item => (
+            <div key={item.session_id} className="modern-card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>{item.exam.title}</h3>
+                <p style={{ color: 'var(--text-secondary)', margin: '0 0 1rem 0', fontSize: '0.95rem' }}>{item.exam.description}</p>
+                
+                <div style={{ background: 'var(--bg-color)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.85rem', display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                  <div><strong>⏱ {item.exam.duration_minutes}m</strong></div>
+                  <div><strong>📋 {item.exam.question_count} Qs</strong></div>
+                  <div><strong>🎯 {item.exam.passing_score}% pass</strong></div>
+                </div>
+                
+                {item.score !== null && (
+                  <p style={{ fontWeight: 'bold', margin: '4px 0', fontSize: '1.1rem', color: 'var(--primary-color)' }}>Score: {item.score}%</p>
+                )}
+              </div>
+              
+              <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+                <span style={{ color: statusColor(item.status), fontWeight: '600', textTransform: 'capitalize', fontSize: '0.9rem' }}>
+                  ● {item.status.replace('_', ' ')}
+                </span>
+                {item.status === 'in_progress' && (
+                  <button
+                    onClick={() => handleStartExamClick(item.session_id)}
+                    className="btn-primary"
+                  >
+                    Start Exam
+                  </button>
+                )}
+                {item.status === 'submitted' && (
+                  <button
+                    onClick={() => navigate(`/results/${item.session_id}`)}
+                    className="btn-outline"
+                  >
+                    View Results
+                  </button>
+                )}
+              </div>
             </div>
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ color: statusColor(item.status), fontWeight: 'bold', textTransform: 'capitalize', margin: '0 0 12px 0' }}>
-                {item.status.replace('_', ' ')}
-              </p>
-              {item.status === 'in_progress' && (
-                <button
-                  onClick={() => handleStartExamClick(item.session_id)}
-                  style={{ 
-                    background: '#1A56DB', 
-                    color: 'white', 
-                    padding: '8px 24px', 
-                    borderRadius: 6,
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    border: 'none'
-                  }}
-                >
-                  Start Exam
-                </button>
-              )}
-              {item.status === 'submitted' && (
-                <button
-                  onClick={() => navigate(`/results/${item.session_id}`)}
-                  style={{ padding: '8px 16px', borderRadius: 6, border: '1px solid #ccc', background: 'white', cursor: 'pointer' }}
-                >
-                  View Results
-                </button>
-              )}
-            </div>
-          </div>
-        ))
+          ))}
+        </div>
       )}
 
       {/* Hardware Setup Modal */}
@@ -265,22 +254,12 @@ export default function CandidateDashboard() {
               )}
             </div>
             
-            <div style={{ padding: '16px 24px', background: '#f9fafb', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
-              <button 
-                onClick={closeModal}
-                style={{ padding: '10px 20px', borderRadius: 6, background: 'white', border: '1px solid #d1d5db', color: '#374151', cursor: 'pointer', fontWeight: 'bold' }}
-              >
-                Cancel
-              </button>
+            <div style={{ padding: '16px 24px', background: 'var(--surface-color)', borderTop: '1px solid var(--border-color)', display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+              <button onClick={closeModal} className="btn-outline">Cancel</button>
               <button 
                 onClick={proceedToExam}
                 disabled={!cameraStream}
-                style={{ 
-                  padding: '10px 24px', borderRadius: 6, border: 'none',
-                  background: cameraStream ? '#1A56DB' : '#9ca3af', 
-                  color: 'white', cursor: cameraStream ? 'pointer' : 'not-allowed',
-                  fontWeight: 'bold', transition: 'background 0.2s'
-                }}
+                className="btn-primary"
               >
                 Proceed to Exam
               </button>

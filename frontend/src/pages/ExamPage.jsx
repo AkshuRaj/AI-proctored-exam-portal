@@ -213,7 +213,7 @@ export default function ExamPage() {
   const question  = questions[current];
 
   return (
-    <div style={{ maxWidth: 800, margin: '40px auto', padding: 24 }}>
+    <div className="app-container animate-fade-in" style={{ position: 'relative' }}>
 
       {/* Proctoring Webcam — fixed top right */}
       <WebcamFeed
@@ -239,26 +239,33 @@ export default function ExamPage() {
       </p>
 
       {/* Question */}
-      <div style={{ background: '#f9f9f9', padding: 24, borderRadius: 8, marginBottom: 24, opacity: cameraBlocked ? 0.5 : 1, pointerEvents: cameraBlocked ? 'none' : 'auto' }}>
-        <h3>{question.question_text}</h3>
-        {['a', 'b', 'c', 'd'].map(opt => (
-          <div
-            key={opt}
-            onClick={() => !cameraBlocked && handleAnswer(question.id, opt)}
-            style={{
-              padding: '12px 16px',
-              margin: '8px 0',
-              borderRadius: 6,
-              border: `2px solid ${answers[question.id] === opt ? '#1A56DB' : '#ddd'}`,
-              background: answers[question.id] === opt ? '#EFF6FF' : 'white',
-              cursor: cameraBlocked ? 'not-allowed' : 'pointer',
-              fontWeight: answers[question.id] === opt ? 'bold' : 'normal',
-              opacity: cameraBlocked ? 0.6 : 1
-            }}
-          >
-            <strong>{opt.toUpperCase()}.</strong> {question[`option_${opt}`]}
-          </div>
-        ))}
+      <div className="modern-card" style={{ marginBottom: '2rem', opacity: cameraBlocked ? 0.5 : 1, pointerEvents: cameraBlocked ? 'none' : 'auto' }}>
+        <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: 'var(--text-primary)' }}>{question.question_text}</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {['a', 'b', 'c', 'd'].map(opt => {
+            const isSelected = answers[question.id] === opt;
+            return (
+              <div
+                key={opt}
+                onClick={() => !cameraBlocked && handleAnswer(question.id, opt)}
+                style={{
+                  padding: '1rem 1.25rem',
+                  borderRadius: '12px',
+                  border: `2px solid ${isSelected ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                  background: isSelected ? 'rgba(79, 70, 229, 0.1)' : 'var(--surface-color)',
+                  cursor: cameraBlocked ? 'not-allowed' : 'pointer',
+                  fontWeight: isSelected ? '600' : '400',
+                  color: isSelected ? 'var(--primary-color)' : 'var(--text-primary)',
+                  transition: 'all 0.2s ease',
+                  opacity: cameraBlocked ? 0.6 : 1
+                }}
+              >
+                <strong style={{ marginRight: '0.5rem', color: isSelected ? 'var(--primary-color)' : 'var(--text-secondary)' }}>{opt.toUpperCase()}.</strong> 
+                {question[`option_${opt}`]}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Camera Blocked Warning */}
@@ -285,10 +292,11 @@ export default function ExamPage() {
       )}
 
       {/* Navigation */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
         <button
           onClick={() => setCurrent(prev => prev - 1)}
           disabled={current === 0 || cameraBlocked}
+          className="btn-outline"
           style={{ opacity: cameraBlocked ? 0.5 : 1, cursor: cameraBlocked ? 'not-allowed' : 'pointer' }}
         >
           ← Previous
@@ -300,13 +308,15 @@ export default function ExamPage() {
               key={q.id}
               onClick={() => !cameraBlocked && setCurrent(i)}
               style={{
-                width: 32, height: 32,
+                width: 36, height: 36,
                 borderRadius: '50%',
-                background: answers[q.id] ? '#1A56DB' : '#ddd',
-                color: answers[q.id] ? 'white' : '#333',
+                background: answers[q.id] ? 'var(--primary-color)' : 'var(--border-color)',
+                color: answers[q.id] ? 'white' : 'var(--text-secondary)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: cameraBlocked ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 'bold',
-                opacity: cameraBlocked ? 0.5 : 1
+                cursor: cameraBlocked ? 'not-allowed' : 'pointer', fontSize: 13, fontWeight: 'bold',
+                opacity: cameraBlocked ? 0.5 : 1,
+                boxShadow: answers[q.id] ? '0 2px 4px rgba(79, 70, 229, 0.3)' : 'none',
+                transition: 'all 0.2s ease'
               }}
             >
               {i + 1}
@@ -315,14 +325,20 @@ export default function ExamPage() {
         </div>
 
         {current < questions.length - 1 ? (
-          <button onClick={() => setCurrent(prev => prev + 1)} disabled={cameraBlocked} style={{ opacity: cameraBlocked ? 0.5 : 1, cursor: cameraBlocked ? 'not-allowed' : 'pointer' }}>
+          <button 
+            onClick={() => setCurrent(prev => prev + 1)} 
+            disabled={cameraBlocked} 
+            className="btn-outline"
+            style={{ opacity: cameraBlocked ? 0.5 : 1, cursor: cameraBlocked ? 'not-allowed' : 'pointer' }}
+          >
             Next →
           </button>
         ) : (
           <button
             onClick={handleSubmit}
             disabled={submitting || cameraBlocked}
-            style={{ background: '#1A56DB', color: 'white', padding: '8px 20px', borderRadius: 6, opacity: (submitting || cameraBlocked) ? 0.5 : 1, cursor: (submitting || cameraBlocked) ? 'not-allowed' : 'pointer' }}
+            className="btn-primary"
+            style={{ opacity: (submitting || cameraBlocked) ? 0.5 : 1, cursor: (submitting || cameraBlocked) ? 'not-allowed' : 'pointer' }}
           >
             {submitting ? 'Submitting...' : 'Submit Exam'}
           </button>
