@@ -20,17 +20,29 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '100px auto', padding: 24 }}>
-      <h1>ProctorIQ</h1>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <input type="email" placeholder="Email"
-          value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
-        <input type="password" placeholder="Password"
-          value={form.password} onChange={e => setForm({...form, password: e.target.value})} />
-        <button type="submit">Login</button>
-      </form>
-      <p>Don't have an account? <Link to="/register">Register</Link></p>
+    <div className="animate-fade-in flex-center" style={{ minHeight: '80vh' }}>
+      <div className="glass-panel" style={{ width: '100%', maxWidth: 450 }}>
+        <h1 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--primary-color)' }}>ProctorIQ</h1>
+        <p style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Login to access your exams</p>
+        
+        {error && (
+          <div style={{ background: 'var(--danger-color)', color: 'white', padding: '10px', borderRadius: '8px', marginBottom: '1rem', textAlign: 'center' }}>
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <input type="email" placeholder="Email Address"
+            value={form.email} onChange={e => setForm({...form, email: e.target.value})} required />
+          <input type="password" placeholder="Password"
+            value={form.password} onChange={e => setForm({...form, password: e.target.value})} required />
+          <button type="submit" className="btn-primary" style={{ marginTop: '0.5rem', padding: '1rem' }}>Sign In</button>
+        </form>
+        
+        <p style={{ textAlign: 'center', marginTop: '2rem' }}>
+          Don't have an account? <Link to="/register" style={{ fontWeight: 'bold' }}>Register Here</Link>
+        </p>
+      </div>
     </div>
   );
 }

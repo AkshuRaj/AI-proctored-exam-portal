@@ -1,21 +1,15 @@
-import { useAuth } from '../context/AuthContext';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  useEffect(() => {
+    if (user?.role === 'candidate') navigate('/candidate');
+    else if (user?.role === 'admin' || user?.role === 'recruiter') navigate('/admin');
+  }, [user]);
 
-  return (
-    <div style={{ padding: 40 }}>
-      <h1>Welcome, {user?.full_name}!</h1>
-      <p>Role: <strong>{user?.role}</strong></p>
-      <p>Email: {user?.email}</p>
-      <button onClick={handleLogout}>Logout</button>
-    </div>
-  );
+  return <div style={{ padding: 40 }}>Redirecting...</div>;
 }

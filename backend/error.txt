@@ -1,0 +1,26 @@
+Traceback (most recent call last):
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\run.py", line 9, in <module>
+    app = create_app()
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\app\__init__.py", line 60, in create_app
+    db.init_app(app)
+    ~~~~~~~~~~~^^^^^
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\venv\Lib\site-packages\flask_sqlalchemy\extension.py", line 374, in init_app
+    engines[key] = self._make_engine(key, options, app)
+                   ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\venv\Lib\site-packages\flask_sqlalchemy\extension.py", line 665, in _make_engine
+    return sa.engine_from_config(options, prefix="")
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\venv\Lib\site-packages\sqlalchemy\engine\create.py", line 844, in engine_from_config
+    return create_engine(url, **options)
+  File "<string>", line 2, in create_engine
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\venv\Lib\site-packages\sqlalchemy\util\deprecations.py", line 281, in warned
+    return fn(*args, **kwargs)  # type: ignore[no-any-return]
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\venv\Lib\site-packages\sqlalchemy\engine\create.py", line 617, in create_engine
+    dbapi = dbapi_meth(**dbapi_args)
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\venv\Lib\site-packages\sqlalchemy\dialects\postgresql\psycopg2.py", line 696, in import_dbapi
+    import psycopg2
+  File "C:\Users\rsash\OneDrive\Desktop\ProctorIQ\backend\venv\Lib\site-packages\psycopg2\__init__.py", line 51, in <module>
+    from psycopg2._psycopg import (                     # noqa
+    ...<10 lines>...
+    )
+ModuleNotFoundError: No module named 'psycopg2._psycopg'
