@@ -90,9 +90,9 @@ def assign_exam(exam_id):
     return jsonify({'message': 'Exam assigned', 'session': session.to_dict()}), 201
 
 
-# ─── GET ALL USERS (admin only) ──────────────────────────
+# ─── GET ALL USERS ───────────────────────────────────────
 @admin_bp.route('/users', methods=['GET'])
-@role_required('admin')
+@role_required('admin', 'recruiter')
 def get_users():
     users = User.query.all()
     return jsonify([u.to_dict() for u in users]), 200
